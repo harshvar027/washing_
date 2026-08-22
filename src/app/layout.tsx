@@ -5,6 +5,10 @@ export const metadata: Metadata = {
   title: "Your Space 1 · Laundry",
   description:
     "See who is using each washing machine at Your Space 1 and ping them when the cycle is done.",
+  icons: {
+    icon: "/your-space-logo.png",
+    apple: "/your-space-logo.png",
+  },
 };
 
 export const viewport: Viewport = {

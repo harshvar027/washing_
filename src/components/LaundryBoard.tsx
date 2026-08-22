@@ -131,14 +131,25 @@ export function LaundryBoard() {
       <header className="relative overflow-hidden rounded-[36px] border border-[var(--header-border)] bg-[var(--header-bg)] px-5 py-6 shadow-[var(--shadow)] sm:px-8 sm:py-8">
         <div className="absolute -right-16 -top-16 h-44 w-44 rounded-full bg-[var(--header-glow)] blur-2xl" />
         <div className="relative flex items-start justify-between gap-3">
-          <p className="text-xs font-semibold tracking-[0.24em] text-[var(--header-kicker)] uppercase">
-            Hostel laundry
-          </p>
+          <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+            <div className="shrink-0 rounded-2xl bg-white px-2.5 py-2 shadow-[0_6px_16px_rgba(0,0,0,0.08)]">
+              <img
+                src="/your-space-logo.png"
+                alt="your space"
+                className="h-9 w-auto sm:h-11"
+              />
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs font-semibold tracking-[0.24em] text-[var(--header-kicker)] uppercase">
+                Hostel laundry
+              </p>
+              <h1 className="display mt-1 text-3xl leading-none text-[var(--header-title)] sm:text-5xl">
+                Your Space 1
+              </h1>
+            </div>
+          </div>
           <ThemeToggle />
         </div>
-        <h1 className="display relative mt-2 text-4xl leading-none text-[var(--header-title)] sm:text-6xl">
-          Your Space 1
-        </h1>
         <p className="relative mt-4 max-w-xl text-sm leading-6 text-[var(--header-copy)] sm:text-base">
           Three floors. Two machines each. Put your name on a washer, then the
           next person can call you when the clothes are done.
@@ -230,6 +241,15 @@ export function LaundryBoard() {
           ))}
         </div>
       )}
+
+      <footer className="mt-16 flex items-center justify-center gap-2 text-sm text-[var(--page-faint)]">
+        <img
+          src="/your-space-logo.png"
+          alt=""
+          className="h-6 w-auto opacity-90"
+        />
+        <span>Your Space 1 · laundry board</span>
+      </footer>
     </main>
   );
 }
