@@ -24,6 +24,17 @@ npm run dev
 
 Everyone in the hostel must use the same running server so they all see the same board.
 
+## Deploy on Vercel
+
+The site already has APIs (`/api/machines`). On your laptop they save to `data/machines.json`. On Vercel that disk is read-only (`EROFS`), so production needs a small Redis database.
+
+1. Create a free Redis database at [Upstash](https://console.upstash.com/).
+2. Copy **UPSTASH_REDIS_REST_URL** and **UPSTASH_REDIS_REST_TOKEN**.
+3. In the Vercel project: **Settings → Environment Variables**, add both names and values.
+4. Redeploy the site.
+
+After that, every phone sees the same board and timers stay locked on the server.
+
 ## How to use it
 
 1. Open the floor you are on.

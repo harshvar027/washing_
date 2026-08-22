@@ -9,8 +9,11 @@ export async function GET() {
   try {
     const machines = await getMachines();
     return boardJson(machines);
-  } catch {
-    return errorJson("Could not read the laundry board.", 500);
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Could not read the laundry board.";
+    const status = message.includes("UPSTASH_REDIS") ? 503 : 500;
+    return errorJson(message, status);
   }
 }
 

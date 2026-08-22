@@ -5,6 +5,8 @@ import type { CycleMinutes, Machine, Occupant, OccupyPayload } from "./types";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const DATA_FILE = path.join(DATA_DIR, "machines.json");
+const REDIS_KEY = "your-space-1:machines";
+const REDIS_LOCK = "your-space-1:machines:lock";
 
 function emptyBoard(): Machine[] {
   return FLOORS.flatMap((floor) =>
@@ -17,15 +19,52 @@ function emptyBoard(): Machine[] {
   );
 }
 
-let writeChain = Promise.resolve();
+function remoteConfig() {
+  const url =
+    process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
+  const token =
+    process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
+  if (!url || !token) return null;
+  return { url, token };
+}
 
-function withLock<T>(fn: () => Promise<T>): Promise<T> {
-  const run = writeChain.then(fn, fn);
-  writeChain = run.then(
-    () => undefined,
-    () => undefined,
+function isServerlessDisk() {
+  return Boolean(
+    process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.LAMBDA_TASK_ROOT,
   );
-  return run;
+}
+
+function missingStoreError() {
+  return new Error(
+    "This host cannot save laundry data to disk. Add UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in the Vercel project settings.",
+  );
+}
+
+async function redis(command: Array<string | number>) {
+  const config = remoteConfig();
+  if (!config) {
+    throw missingStoreError();
+  }
+
+  const response = await fetch(config.url, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${config.token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(command),
+    cache: "no-store",
+  });
+
+  const data = (await response.json().catch(() => null)) as
+    | { result?: unknown; error?: string }
+    | null;
+
+  if (!response.ok || data?.error) {
+    throw new Error(data?.error || "Could not reach the laundry database.");
+  }
+
+  return data?.result;
 }
 
 function isCycle(value: unknown): value is CycleMinutes {
@@ -72,7 +111,7 @@ function sanitizeBoard(raw: unknown): Machine[] {
   }));
 }
 
-async function readBoard(): Promise<Machine[]> {
+async function readFileBoard(): Promise<Machine[]> {
   try {
     const raw = await readFile(DATA_FILE, "utf8");
     return sanitizeBoard(JSON.parse(raw));
@@ -81,9 +120,88 @@ async function readBoard(): Promise<Machine[]> {
   }
 }
 
+async function writeFileBoard(machines: Machine[]) {
+  try {
+    await mkdir(DATA_DIR, { recursive: true });
+    await writeFile(DATA_FILE, JSON.stringify(machines, null, 2), "utf8");
+  } catch (error) {
+    const code =
+      error && typeof error === "object" && "code" in error
+        ? String(error.code)
+        : "";
+    if (code === "EROFS" || isServerlessDisk()) {
+      throw missingStoreError();
+    }
+    throw error;
+  }
+}
+
+async function readRemoteBoard(): Promise<Machine[]> {
+  const raw = await redis(["GET", REDIS_KEY]);
+  if (typeof raw !== "string" || !raw) {
+    return emptyBoard();
+  }
+  return sanitizeBoard(JSON.parse(raw));
+}
+
+async function writeRemoteBoard(machines: Machine[]) {
+  await redis(["SET", REDIS_KEY, JSON.stringify(machines)]);
+}
+
+async function readBoard(): Promise<Machine[]> {
+  if (remoteConfig()) {
+    return readRemoteBoard();
+  }
+  if (isServerlessDisk()) {
+    throw missingStoreError();
+  }
+  return readFileBoard();
+}
+
 async function writeBoard(machines: Machine[]) {
-  await mkdir(DATA_DIR, { recursive: true });
-  await writeFile(DATA_FILE, JSON.stringify(machines, null, 2), "utf8");
+  if (remoteConfig()) {
+    await writeRemoteBoard(machines);
+    return;
+  }
+  if (isServerlessDisk()) {
+    throw missingStoreError();
+  }
+  await writeFileBoard(machines);
+}
+
+let writeChain = Promise.resolve();
+
+function withLocalLock<T>(fn: () => Promise<T>): Promise<T> {
+  const run = writeChain.then(fn, fn);
+  writeChain = run.then(
+    () => undefined,
+    () => undefined,
+  );
+  return run;
+}
+
+async function sleep(ms: number) {
+  await new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function withLock<T>(fn: () => Promise<T>): Promise<T> {
+  if (!remoteConfig()) {
+    return withLocalLock(fn);
+  }
+
+  for (let attempt = 0; attempt < 8; attempt += 1) {
+    const locked = await redis(["SET", REDIS_LOCK, "1", "NX", "EX", 5]);
+    if (locked === "OK") {
+      try {
+        return await fn();
+      } finally {
+        await redis(["DEL", REDIS_LOCK]);
+      }
+    }
+    await sleep(60 * (attempt + 1));
+  }
+
+  throw new Error("The board is busy. Try again.");
 }
 
 export async function getMachines(): Promise<Machine[]> {
