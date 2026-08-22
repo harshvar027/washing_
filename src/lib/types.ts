@@ -1,0 +1,43 @@
+export type CycleMinutes = 30 | 45 | 60;
+export type MachineStatus = "free" | "washing" | "ready";
+
+export type Occupant = {
+  name: string;
+  phone: string;
+  startedAt: string;
+  cycleMinutes: CycleMinutes;
+};
+
+export type Machine = {
+  id: string;
+  floor: 1 | 2 | 3;
+  number: 1 | 2;
+  occupant: Occupant | null;
+};
+
+export type OccupyPayload = {
+  name: string;
+  phone: string;
+  cycleMinutes: number;
+};
+
+export type PublicOccupant = {
+  name: string;
+  phone: string;
+  cycleMinutes: CycleMinutes;
+};
+
+export type PublicMachine = {
+  id: string;
+  floor: 1 | 2 | 3;
+  number: 1 | 2;
+  status: MachineStatus;
+  remainingSeconds: number | null;
+  startedLabel: string | null;
+  occupant: PublicOccupant | null;
+};
+
+export type BoardPayload = {
+  serverNow: number;
+  machines: PublicMachine[];
+};

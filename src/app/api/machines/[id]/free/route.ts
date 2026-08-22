@@ -1,0 +1,32 @@
+import { boardJson, errorJson, methodLocked } from "@/lib/http";
+import { freeMachine } from "@/lib/store";
+
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
+export async function POST(
+  _request: Request,
+  context: { params: Promise<{ id: string }> },
+) {
+  try {
+    const { id } = await context.params;
+    const machines = await freeMachine(id);
+    return boardJson(machines);
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Could not free this machine.";
+    return errorJson(message);
+  }
+}
+
+export function PUT() {
+  return methodLocked();
+}
+
+export function PATCH() {
+  return methodLocked();
+}
+
+export function DELETE() {
+  return methodLocked();
+}
