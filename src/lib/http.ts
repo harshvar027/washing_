@@ -8,8 +8,14 @@ const NO_STORE = {
   Expires: "0",
 };
 
-export function boardJson(machines: Machine[]) {
-  return NextResponse.json(presentBoard(machines), { headers: NO_STORE });
+export function boardJson(
+  machines: Machine[],
+  extra: { claimToken?: string; claimId?: string } = {},
+) {
+  return NextResponse.json(
+    { ...presentBoard(machines), ...extra },
+    { headers: NO_STORE },
+  );
 }
 
 export function errorJson(message: string, status = 400) {

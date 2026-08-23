@@ -7,6 +7,8 @@ export type Occupant = {
   phone: string;
   startedAt: string;
   cycleMinutes: CycleMinutes;
+  claimToken: string;
+  claimId: string;
 };
 
 export type Machine = {
@@ -28,6 +30,7 @@ export type PublicOccupant = {
   room: string;
   phone: string;
   cycleMinutes: CycleMinutes;
+  claimId: string;
 };
 
 export type PublicMachine = {
@@ -43,4 +46,6 @@ export type PublicMachine = {
 export type BoardPayload = {
   serverNow: number;
   machines: PublicMachine[];
+  claimToken?: string;
+  claimId?: string;
 };

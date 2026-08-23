@@ -14,13 +14,16 @@ export async function POST(
       string,
       unknown
     >;
-    const machines = await occupyMachine(id, {
+    const { machines, claimToken } = await occupyMachine(id, {
       name: String(body.name ?? ""),
       room: String(body.room ?? ""),
       phone: String(body.phone ?? ""),
       cycleMinutes: Number(body.cycleMinutes),
     });
-    return boardJson(machines);
+    return boardJson(machines, {
+      claimToken,
+      claimId: machines.find((machine) => machine.id === id)?.occupant?.claimId,
+    });
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Could not register this machine.";

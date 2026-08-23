@@ -37,6 +37,7 @@ function presentMachine(machine: Machine, now: number): PublicMachine {
           room: machine.occupant.room,
           phone: machine.occupant.phone,
           cycleMinutes: machine.occupant.cycleMinutes,
+          claimId: machine.occupant.claimId,
         }
       : null,
   };

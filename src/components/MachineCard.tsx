@@ -9,6 +9,7 @@ import { WasherVisual } from "./WasherVisual";
 type Props = {
   machine: PublicMachine;
   remainingSeconds: number | null;
+  isOwner: boolean;
   busy: boolean;
   onOccupy: (payload: {
     name: string;
@@ -22,6 +23,7 @@ type Props = {
 export function MachineCard({
   machine,
   remainingSeconds,
+  isOwner,
   busy,
   onOccupy,
   onFree,
@@ -145,39 +147,47 @@ export function MachineCard({
                   WhatsApp
                 </a>
               </div>
-              {confirmFree ? (
-                <div className="glass glass-strong rounded-2xl p-3">
-                  <p className="relative z-10 text-sm leading-6 text-[var(--card-muted)]">
-                    Only do this after the clothes are actually taken out. This
-                    does not change the wash clock — it just frees the machine.
-                  </p>
-                  <div className="relative z-10 mt-3 grid grid-cols-2 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setConfirmFree(false)}
-                      className="btn-press glass rounded-xl px-3 py-2.5 text-sm font-semibold"
-                    >
-                      Back
-                    </button>
-                    <button
-                      type="button"
-                      disabled={busy}
-                      onClick={onFree}
-                      className="btn-press rounded-xl bg-[var(--ink-btn)] px-3 py-2.5 text-sm font-semibold text-[var(--page)] disabled:opacity-60"
-                    >
-                      Yes, collected
-                    </button>
+              {isOwner ? (
+                confirmFree ? (
+                  <div className="glass glass-strong rounded-2xl p-3">
+                    <p className="relative z-10 text-sm leading-6 text-[var(--card-muted)]">
+                      Only do this after the clothes are actually taken out.
+                      This does not change the wash clock — it just frees the
+                      machine.
+                    </p>
+                    <div className="relative z-10 mt-3 grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setConfirmFree(false)}
+                        className="btn-press glass rounded-xl px-3 py-2.5 text-sm font-semibold"
+                      >
+                        Back
+                      </button>
+                      <button
+                        type="button"
+                        disabled={busy}
+                        onClick={onFree}
+                        className="btn-press rounded-xl bg-[var(--ink-btn)] px-3 py-2.5 text-sm font-semibold text-[var(--page)] disabled:opacity-60"
+                      >
+                        Yes, collected
+                      </button>
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <button
+                    type="button"
+                    disabled={busy}
+                    onClick={() => setConfirmFree(true)}
+                    className="btn-press glass relative z-10 rounded-2xl px-3 py-3.5 text-sm font-semibold disabled:opacity-60"
+                  >
+                    Clothes collected
+                  </button>
+                )
               ) : (
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={() => setConfirmFree(true)}
-                  className="btn-press glass relative z-10 rounded-2xl px-3 py-3.5 text-sm font-semibold disabled:opacity-60"
-                >
-                  Clothes collected
-                </button>
+                <p className="rounded-2xl px-1 pt-1 text-center text-sm leading-6 text-[var(--card-muted)]">
+                  Only {occupant.name} can tap collected on the phone that
+                  started this wash.
+                </p>
               )}
             </>
           ) : (

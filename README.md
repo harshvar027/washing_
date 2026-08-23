@@ -42,4 +42,4 @@ After that, every phone sees the same board and timers stay locked on the server
 3. Enter your name, room number, 10-digit phone number, and wash time (30 / 45 / 60 minutes).
 4. The countdown starts on the server at that moment and cannot be edited.
 5. When clothes are left behind, the next person taps **Call** or **WhatsApp**.
-6. After the clothes are taken out, tap **Clothes collected** so the machine shows as free.
+6. Only the person who started the wash can tap **Clothes collected**, and only on the same phone.

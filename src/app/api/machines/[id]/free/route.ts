@@ -5,17 +5,22 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function POST(
-  _request: Request,
+  request: Request,
   context: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await context.params;
-    const machines = await freeMachine(id);
+    const body = (await request.json().catch(() => ({}))) as Record<
+      string,
+      unknown
+    >;
+    const machines = await freeMachine(id, String(body.token ?? ""));
     return boardJson(machines);
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Could not free this machine.";
-    return errorJson(message);
+    const status = message.includes("Only the person") ? 403 : 400;
+    return errorJson(message, status);
   }
 }
 
