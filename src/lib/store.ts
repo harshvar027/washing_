@@ -77,6 +77,7 @@ function sanitizeOccupant(raw: unknown): Occupant | null {
   const name = String(row.name ?? "")
     .trim()
     .replace(/\s+/g, " ");
+  const room = normalizeRoom(String(row.room ?? ""));
   const phone = String(row.phone ?? "").replace(/\D/g, "");
   const startedAt = Date.parse(String(row.startedAt ?? ""));
   const cycleMinutes = Number(row.cycleMinutes);
@@ -87,6 +88,7 @@ function sanitizeOccupant(raw: unknown): Occupant | null {
 
   return {
     name,
+    room,
     phone,
     startedAt: new Date(startedAt).toISOString(),
     cycleMinutes,
@@ -208,6 +210,10 @@ export async function getMachines(): Promise<Machine[]> {
   return withLock(readBoard);
 }
 
+function normalizeRoom(room: string): string {
+  return room.trim().replace(/\s+/g, "").toUpperCase();
+}
+
 function normalizePhone(phone: string): string {
   const digits = phone.replace(/\D/g, "");
   if (digits.length === 12 && digits.startsWith("91")) {
@@ -225,6 +231,11 @@ function validateOccupy(payload: OccupyPayload) {
     throw new Error("Enter a name between 2 and 40 characters.");
   }
 
+  const room = normalizeRoom(payload.room);
+  if (!/^[A-Z0-9-]{1,8}$/.test(room)) {
+    throw new Error("Enter a valid room number, like 203 or B12.");
+  }
+
   const phone = normalizePhone(payload.phone);
   if (!/^[6-9]\d{9}$/.test(phone)) {
     throw new Error("Enter a valid 10-digit Indian mobile number.");
@@ -235,7 +246,7 @@ function validateOccupy(payload: OccupyPayload) {
     throw new Error("Pick a wash cycle of 30, 45, or 60 minutes.");
   }
 
-  return { name, phone, cycleMinutes };
+  return { name, room, phone, cycleMinutes };
 }
 
 export async function occupyMachine(
@@ -254,10 +265,11 @@ export async function occupyMachine(
       );
     }
 
-    const { name, phone, cycleMinutes } = validateOccupy(payload);
+    const { name, room, phone, cycleMinutes } = validateOccupy(payload);
 
     machine.occupant = {
       name,
+      room,
       phone,
       startedAt: new Date().toISOString(),
       cycleMinutes,

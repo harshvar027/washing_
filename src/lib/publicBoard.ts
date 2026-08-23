@@ -34,6 +34,7 @@ function presentMachine(machine: Machine, now: number): PublicMachine {
     occupant: machine.occupant
       ? {
           name: machine.occupant.name,
+          room: machine.occupant.room,
           phone: machine.occupant.phone,
           cycleMinutes: machine.occupant.cycleMinutes,
         }

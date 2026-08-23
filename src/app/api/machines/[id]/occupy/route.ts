@@ -16,6 +16,7 @@ export async function POST(
     >;
     const machines = await occupyMachine(id, {
       name: String(body.name ?? ""),
+      room: String(body.room ?? ""),
       phone: String(body.phone ?? ""),
       cycleMinutes: Number(body.cycleMinutes),
     });

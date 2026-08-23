@@ -77,7 +77,7 @@ export function LaundryBoard() {
 
   async function occupy(
     id: string,
-    payload: { name: string; phone: string; cycleMinutes: number },
+    payload: { name: string; room: string; phone: string; cycleMinutes: number },
   ) {
     setBusyId(id);
     setNotice("");
@@ -87,6 +87,7 @@ export function LaundryBoard() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: payload.name,
+          room: payload.room,
           phone: payload.phone,
           cycleMinutes: payload.cycleMinutes,
         }),

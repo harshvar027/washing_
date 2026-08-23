@@ -12,6 +12,7 @@ type Props = {
   busy: boolean;
   onOccupy: (payload: {
     name: string;
+    room: string;
     phone: string;
     cycleMinutes: number;
   }) => Promise<void>;
@@ -37,7 +38,8 @@ export function MachineCard({
 
   const pingMessage = useMemo(() => {
     if (!occupant) return "";
-    return `Hi ${occupant.name}, your clothes in Floor ${machine.floor} Machine ${machine.number} at Your Space 1 are done. Please collect them so the next person can use the machine.`;
+    const roomBit = occupant.room ? ` from room ${occupant.room}` : "";
+    return `Hi ${occupant.name}${roomBit}, your clothes in Floor ${machine.floor} Machine ${machine.number} at Your Space 1 are done. Please collect them so the next person can use the machine.`;
   }, [occupant, machine.floor, machine.number]);
 
   const statusCopy =
@@ -87,6 +89,11 @@ export function MachineCard({
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-lg font-semibold">{occupant.name}</p>
+                {occupant.room ? (
+                  <p className="mt-0.5 text-sm font-semibold text-[var(--card-text)]">
+                    Room {occupant.room}
+                  </p>
+                ) : null}
                 <p className="mt-0.5 text-sm text-[var(--card-muted)]">
                   {formatPhone(occupant.phone)}
                 </p>
@@ -114,8 +121,8 @@ export function MachineCard({
           </div>
         ) : (
           <p className="mt-4 text-sm leading-6 text-[var(--card-muted)]">
-            Register before you start. Your name and number stay on this machine
-            until the clothes are collected.
+            Register your name, room, and phone before you start. They stay on
+            this machine until the clothes are collected.
           </p>
         )}
 

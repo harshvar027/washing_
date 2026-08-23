@@ -3,6 +3,7 @@ export type MachineStatus = "free" | "washing" | "ready";
 
 export type Occupant = {
   name: string;
+  room: string;
   phone: string;
   startedAt: string;
   cycleMinutes: CycleMinutes;
@@ -17,12 +18,14 @@ export type Machine = {
 
 export type OccupyPayload = {
   name: string;
+  room: string;
   phone: string;
   cycleMinutes: number;
 };
 
 export type PublicOccupant = {
   name: string;
+  room: string;
   phone: string;
   cycleMinutes: CycleMinutes;
 };

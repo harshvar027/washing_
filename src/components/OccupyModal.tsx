@@ -10,6 +10,7 @@ type Props = {
   onClose: () => void;
   onSubmit: (payload: {
     name: string;
+    room: string;
     phone: string;
     cycleMinutes: number;
   }) => Promise<void>;
@@ -23,6 +24,7 @@ export function OccupyModal({
   onSubmit,
 }: Props) {
   const [name, setName] = useState("");
+  const [room, setRoom] = useState("");
   const [phone, setPhone] = useState("");
   const [cycleMinutes, setCycleMinutes] = useState(45);
   const [error, setError] = useState("");
@@ -31,7 +33,7 @@ export function OccupyModal({
     event.preventDefault();
     setError("");
     try {
-      await onSubmit({ name, phone, cycleMinutes });
+      await onSubmit({ name, room, phone, cycleMinutes });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not register.");
     }
@@ -61,6 +63,20 @@ export function OccupyModal({
             value={name}
             onChange={(event) => setName(event.target.value)}
             placeholder="Your name"
+            className="mt-1.5 w-full rounded-2xl border border-[var(--card-line)] bg-[var(--ghost)] px-4 py-3 font-normal outline-none focus:border-[var(--teal)]"
+          />
+        </label>
+
+        <label className="mt-4 block text-sm font-semibold">
+          Room number
+          <input
+            required
+            maxLength={8}
+            value={room}
+            onChange={(event) =>
+              setRoom(event.target.value.replace(/[^a-zA-Z0-9-\s]/g, ""))
+            }
+            placeholder="e.g. 203"
             className="mt-1.5 w-full rounded-2xl border border-[var(--card-line)] bg-[var(--ghost)] px-4 py-3 font-normal outline-none focus:border-[var(--teal)]"
           />
         </label>
