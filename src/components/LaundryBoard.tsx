@@ -258,6 +258,10 @@ export function LaundryBoard() {
                       status === "authenticated" &&
                       Boolean(session?.user)
                     }
+                    onDismissClaim={() => {
+                      sessionStorage.removeItem(PENDING_MACHINE_KEY);
+                      setPendingMachineId(null);
+                    }}
                     onOccupy={async (payload) => {
                       sessionStorage.removeItem(PENDING_MACHINE_KEY);
                       setPendingMachineId(null);

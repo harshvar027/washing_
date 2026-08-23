@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { signIn, useSession } from "next-auth/react";
 import { PENDING_MACHINE_KEY, CYCLE_MINUTES } from "@/lib/constants";
 import { GoogleMark } from "./AuthButton";
@@ -33,6 +34,33 @@ export function OccupyModal({
   const [phone, setPhone] = useState("");
   const [cycleMinutes, setCycleMinutes] = useState(45);
   const [error, setError] = useState("");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    const { body, documentElement } = document;
+    const scrollY = window.scrollY;
+    const previous = {
+      htmlOverflow: documentElement.style.overflow,
+      bodyOverflow: body.style.overflow,
+      bodyPosition: body.style.position,
+      bodyTop: body.style.top,
+      bodyWidth: body.style.width,
+    };
+    documentElement.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+    body.style.position = "fixed";
+    body.style.top = `-${scrollY}px`;
+    body.style.width = "100%";
+    return () => {
+      documentElement.style.overflow = previous.htmlOverflow;
+      body.style.overflow = previous.bodyOverflow;
+      body.style.position = previous.bodyPosition;
+      body.style.top = previous.bodyTop;
+      body.style.width = previous.bodyWidth;
+      window.scrollTo(0, scrollY);
+    };
+  }, []);
 
   useEffect(() => {
     const googleName = session?.user?.name?.trim() ?? "";
@@ -70,10 +98,16 @@ export function OccupyModal({
   const googlePhoneMissing = Boolean(session?.user && !session.user.phone);
   const nameLocked = Boolean(session?.user?.name?.trim());
 
-  return (
-    <div className="fixed inset-0 z-50 grid place-items-end bg-[var(--overlay)] p-4 backdrop-blur-xl sm:place-items-center">
+  if (!mounted) return null;
+
+  return createPortal(
+    <div
+      className="fixed inset-0 z-[100] grid place-items-end overflow-y-auto overscroll-none bg-[var(--overlay)] p-4 backdrop-blur-xl sm:place-items-center"
+      onClick={close}
+    >
       <form
         onSubmit={handleSubmit}
+        onClick={(event) => event.stopPropagation()}
         className="glass glass-strong fade-up w-full max-w-md overflow-hidden rounded-[32px] p-5 text-[var(--card-text)]"
       >
         <p className="relative z-10 text-xs font-semibold tracking-[0.2em] text-[var(--teal)] uppercase">
@@ -192,6 +226,7 @@ export function OccupyModal({
           </button>
         </div>
       </form>
-    </div>
+    </div>,
+    document.body,
   );
 }

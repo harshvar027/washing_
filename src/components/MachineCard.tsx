@@ -15,6 +15,7 @@ type Props = {
   busy: boolean;
   signedIn: boolean;
   sessionLoading: boolean;
+  onDismissClaim: () => void;
   onOccupy: (payload: {
     name: string;
     room: string;
@@ -31,6 +32,7 @@ export function MachineCard({
   busy,
   signedIn,
   sessionLoading,
+  onDismissClaim,
   onOccupy,
   onFree,
 }: Props) {
@@ -40,6 +42,11 @@ export function MachineCard({
   useEffect(() => {
     if (startOpen && signedIn) setOpen(true);
   }, [startOpen, signedIn]);
+
+  function closeClaim() {
+    setOpen(false);
+    onDismissClaim();
+  }
 
   function startClaim() {
     if (sessionLoading || busy) return;
@@ -221,7 +228,7 @@ export function MachineCard({
           floor={machine.floor}
           number={machine.number}
           busy={busy}
-          onClose={() => setOpen(false)}
+          onClose={closeClaim}
           onSubmit={async (payload) => {
             await onOccupy(payload);
             setOpen(false);
