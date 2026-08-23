@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { signIn } from "next-auth/react";
+import { PENDING_MACHINE_KEY } from "@/lib/constants";
 import { formatCountdown, formatPhone } from "@/lib/format";
 import type { MachineStatus, PublicMachine } from "@/lib/types";
 import { OccupyModal } from "./OccupyModal";
@@ -11,6 +13,9 @@ type Props = {
   remainingSeconds: number | null;
   startOpen?: boolean;
   busy: boolean;
+  signedIn: boolean;
+  sessionLoading: boolean;
+  googleAvailable: boolean;
   onOccupy: (payload: {
     name: string;
     room: string;
@@ -25,6 +30,9 @@ export function MachineCard({
   remainingSeconds,
   startOpen = false,
   busy,
+  signedIn,
+  sessionLoading,
+  googleAvailable,
   onOccupy,
   onFree,
 }: Props) {
@@ -34,6 +42,16 @@ export function MachineCard({
   useEffect(() => {
     if (startOpen) setOpen(true);
   }, [startOpen]);
+
+  function startClaim() {
+    if (sessionLoading || busy) return;
+    if (googleAvailable && !signedIn) {
+      sessionStorage.setItem(PENDING_MACHINE_KEY, machine.id);
+      void signIn("google", { callbackUrl: "/" });
+      return;
+    }
+    setOpen(true);
+  }
   const occupant = machine.occupant;
   const liveRemaining = remainingSeconds ?? 0;
   const status: MachineStatus = !occupant
@@ -127,8 +145,8 @@ export function MachineCard({
           </div>
         ) : (
           <p className="relative z-10 mt-4 text-sm leading-6 text-[var(--card-muted)]">
-            Register your name, room, and phone before you start. They stay on
-            this machine until the clothes are collected.
+            Sign in with Google, then add your room before you start. Your
+            details stay on this machine until the clothes are collected.
           </p>
         )}
 
@@ -189,8 +207,8 @@ export function MachineCard({
           ) : (
             <button
               type="button"
-              disabled={busy}
-              onClick={() => setOpen(true)}
+              disabled={busy || sessionLoading}
+              onClick={startClaim}
               className="btn-press rounded-2xl bg-[#0f6b63] px-3 py-3.5 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(15,107,99,0.28)] disabled:opacity-60"
             >
               I am using this machine

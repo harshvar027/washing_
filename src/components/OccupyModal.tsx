@@ -82,8 +82,9 @@ export function OccupyModal({
         </p>
         <h2 className="display relative z-10 mt-1 text-3xl">Claim this washer</h2>
         <p className="relative z-10 mt-2 text-sm leading-6 text-[var(--card-muted)]">
-          Sign in with Google to fill your name and phone. If Google has no
-          number, type it yourself. Room number is still entered by you.
+          {session?.user
+            ? "Name and phone come from Google when they can. Add your room, pick a cycle, then start the timer."
+            : "Sign in with Google first. Room number is still entered by you."}
         </p>
 
         {googleAvailable && !session?.user ? (

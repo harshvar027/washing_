@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { getProviders, useSession } from "next-auth/react";
 import { FLOORS, PENDING_MACHINE_KEY } from "@/lib/constants";
 import type { BoardPayload, PublicMachine } from "@/lib/types";
 import { AuthButton } from "./AuthButton";
@@ -15,6 +16,7 @@ async function readError(response: Response) {
 }
 
 export function LaundryBoard() {
+  const { data: session, status } = useSession();
   const [machines, setMachines] = useState<PublicMachine[]>([]);
   const [syncedAt, setSyncedAt] = useState(0);
   const [now, setNow] = useState(0);
@@ -23,6 +25,13 @@ export function LaundryBoard() {
   const [loading, setLoading] = useState(true);
   const [activeFloor, setActiveFloor] = useState<(typeof FLOORS)[number]>(1);
   const [pendingMachineId, setPendingMachineId] = useState<string | null>(null);
+  const [googleAvailable, setGoogleAvailable] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    getProviders()
+      .then((providers) => setGoogleAvailable(Boolean(providers?.google)))
+      .catch(() => setGoogleAvailable(false));
+  }, []);
 
   const applyBoard = useCallback((data: BoardPayload) => {
     setMachines(data.machines);
@@ -248,7 +257,15 @@ export function LaundryBoard() {
                     machine={machine}
                     remainingSeconds={liveRemaining(machine)}
                     busy={busyId === machine.id}
-                    startOpen={pendingMachineId === machine.id}
+                    signedIn={Boolean(session?.user)}
+                    sessionLoading={status === "loading" || googleAvailable === null}
+                    googleAvailable={googleAvailable === true}
+                    startOpen={
+                      pendingMachineId === machine.id &&
+                      status !== "loading" &&
+                      googleAvailable !== null &&
+                      (Boolean(session?.user) || !googleAvailable)
+                    }
                     onOccupy={async (payload) => {
                       sessionStorage.removeItem(PENDING_MACHINE_KEY);
                       setPendingMachineId(null);
