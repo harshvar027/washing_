@@ -40,21 +40,21 @@ export function OccupyModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-end bg-[var(--overlay)] p-4 backdrop-blur-[3px] sm:place-items-center">
+    <div className="fixed inset-0 z-50 grid place-items-end bg-[var(--overlay)] p-4 backdrop-blur-xl sm:place-items-center">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-md rounded-[32px] bg-[var(--card)] p-5 text-[var(--card-text)] shadow-2xl"
+        className="glass glass-strong fade-up w-full max-w-md overflow-hidden rounded-[32px] p-5 text-[var(--card-text)]"
       >
-        <p className="text-xs font-semibold tracking-[0.2em] text-[var(--teal)] uppercase">
+        <p className="relative z-10 text-xs font-semibold tracking-[0.2em] text-[var(--teal)] uppercase">
           Floor {floor} · Machine {number}
         </p>
-        <h2 className="display mt-1 text-3xl">Claim this washer</h2>
-        <p className="mt-2 text-sm leading-6 text-[var(--card-muted)]">
+        <h2 className="display relative z-10 mt-1 text-3xl">Claim this washer</h2>
+        <p className="relative z-10 mt-2 text-sm leading-6 text-[var(--card-muted)]">
           The cycle clock starts on the hostel server the moment you register.
           Phones cannot move it forward or back.
         </p>
 
-        <label className="mt-5 block text-sm font-semibold">
+        <label className="relative z-10 mt-5 block text-sm font-semibold">
           Name
           <input
             required
@@ -63,11 +63,11 @@ export function OccupyModal({
             value={name}
             onChange={(event) => setName(event.target.value)}
             placeholder="Your name"
-            className="mt-1.5 w-full rounded-2xl border border-[var(--card-line)] bg-[var(--ghost)] px-4 py-3 font-normal outline-none focus:border-[var(--teal)]"
+            className="glass mt-1.5 w-full rounded-2xl px-4 py-3 font-normal outline-none focus:border-[var(--teal)]"
           />
         </label>
 
-        <label className="mt-4 block text-sm font-semibold">
+        <label className="relative z-10 mt-4 block text-sm font-semibold">
           Room number
           <input
             required
@@ -77,11 +77,11 @@ export function OccupyModal({
               setRoom(event.target.value.replace(/[^a-zA-Z0-9-\s]/g, ""))
             }
             placeholder="e.g. 203"
-            className="mt-1.5 w-full rounded-2xl border border-[var(--card-line)] bg-[var(--ghost)] px-4 py-3 font-normal outline-none focus:border-[var(--teal)]"
+            className="glass mt-1.5 w-full rounded-2xl px-4 py-3 font-normal outline-none focus:border-[var(--teal)]"
           />
         </label>
 
-        <label className="mt-4 block text-sm font-semibold">
+        <label className="relative z-10 mt-4 block text-sm font-semibold">
           Phone number
           <input
             required
@@ -90,21 +90,21 @@ export function OccupyModal({
             value={phone}
             onChange={(event) => setPhone(event.target.value.replace(/[^\d+\s-]/g, ""))}
             placeholder="10-digit mobile"
-            className="mt-1.5 w-full rounded-2xl border border-[var(--card-line)] bg-[var(--ghost)] px-4 py-3 font-normal outline-none focus:border-[var(--teal)]"
+            className="glass mt-1.5 w-full rounded-2xl px-4 py-3 font-normal outline-none focus:border-[var(--teal)]"
           />
         </label>
 
-        <p className="mt-4 text-sm font-semibold">Wash cycle</p>
-        <div className="mt-1.5 grid grid-cols-3 gap-2">
+        <p className="relative z-10 mt-4 text-sm font-semibold">Wash cycle</p>
+        <div className="relative z-10 mt-1.5 grid grid-cols-3 gap-2">
           {CYCLE_MINUTES.map((cycle) => (
             <button
               key={cycle}
               type="button"
               onClick={() => setCycleMinutes(cycle)}
-              className={`rounded-2xl border px-3 py-3 text-sm font-semibold ${
+              className={`btn-press rounded-2xl px-3 py-3 text-sm font-semibold ${
                 cycleMinutes === cycle
-                  ? "border-[var(--teal)] bg-[var(--teal)] text-white"
-                  : "border-[var(--card-line)] bg-[var(--ghost)] text-[var(--card-text)]"
+                  ? "bg-[var(--teal)] text-white shadow-[0_10px_20px_rgba(15,107,99,0.25)]"
+                  : "glass text-[var(--card-text)]"
               }`}
             >
               {cycle} min
@@ -116,18 +116,18 @@ export function OccupyModal({
           <p className="mt-4 text-sm font-medium text-[#c43c32]">{error}</p>
         ) : null}
 
-        <div className="mt-5 grid grid-cols-2 gap-2">
+        <div className="relative z-10 mt-5 grid grid-cols-2 gap-2">
           <button
             type="button"
             onClick={onClose}
-            className="rounded-2xl border border-[var(--card-line)] bg-[var(--ghost)] px-3 py-3 text-sm font-semibold"
+            className="btn-press glass rounded-2xl px-3 py-3 text-sm font-semibold"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={busy}
-            className="rounded-2xl bg-[var(--teal)] px-3 py-3 text-sm font-semibold text-white disabled:opacity-60"
+            className="btn-press rounded-2xl bg-[var(--teal)] px-3 py-3 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(15,107,99,0.28)] disabled:opacity-60"
           >
             Start timer
           </button>

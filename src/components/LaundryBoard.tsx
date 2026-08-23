@@ -128,16 +128,19 @@ export function LaundryBoard() {
   }
 
   return (
-    <main className="mx-auto min-h-dvh max-w-5xl px-4 pb-20 pt-6 sm:px-6">
-      <header className="relative overflow-hidden rounded-[36px] border border-[var(--header-border)] bg-[var(--header-bg)] px-5 py-6 shadow-[var(--shadow)] sm:px-8 sm:py-8">
-        <div className="absolute -right-16 -top-16 h-44 w-44 rounded-full bg-[var(--header-glow)] blur-2xl" />
-        <div className="relative flex items-start justify-between gap-3">
+    <main className="relative z-10 mx-auto min-h-dvh max-w-5xl px-4 pb-20 pt-6 sm:px-6">
+      <div className="orb orb-a" />
+      <div className="orb orb-b" />
+      <div className="orb orb-c" />
+
+      <header className="glass shine fade-up overflow-hidden rounded-[36px] px-5 py-6 sm:px-8 sm:py-8">
+        <div className="relative z-10 flex items-start justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3 sm:gap-4">
-            <div className="shrink-0 rounded-2xl bg-white px-2.5 py-2 shadow-[0_6px_16px_rgba(0,0,0,0.08)]">
+            <div className="glass glass-strong shrink-0 rounded-2xl px-2.5 py-2">
               <img
                 src="/your-space-logo.png"
                 alt="your space"
-                className="h-9 w-auto sm:h-11"
+                className="relative z-10 h-9 w-auto sm:h-11"
               />
             </div>
             <div className="min-w-0">
@@ -151,39 +154,39 @@ export function LaundryBoard() {
           </div>
           <ThemeToggle />
         </div>
-        <p className="relative mt-4 max-w-xl text-sm leading-6 text-[var(--header-copy)] sm:text-base">
+        <p className="relative z-10 mt-4 max-w-xl text-sm leading-6 text-[var(--header-copy)] sm:text-base">
           Three floors. Two machines each. Put your name on a washer, then the
           next person can call you when the clothes are done.
         </p>
-        <div className="relative mt-5 flex flex-wrap gap-2 text-sm">
-          <span className="rounded-full bg-[#e5f4ec] px-3 py-1.5 font-semibold text-[#2f7a58]">
+        <div className="relative z-10 mt-5 flex flex-wrap gap-2 text-sm">
+          <span className="glass rounded-full bg-[var(--chip-free-bg)] px-3 py-1.5 font-semibold text-[#2f7a58]">
             {6 - inUse} free
           </span>
-          <span className="rounded-full bg-[#fff1dd] px-3 py-1.5 font-semibold text-[#9a5e1d]">
+          <span className="glass rounded-full bg-[var(--chip-run-bg)] px-3 py-1.5 font-semibold text-[#9a5e1d]">
             {inUse} running
           </span>
           {readyCount > 0 ? (
-            <span className="rounded-full bg-[#fde3e0] px-3 py-1.5 font-semibold text-[#c43c32]">
+            <span className="glass rounded-full bg-[var(--chip-ready-bg)] px-3 py-1.5 font-semibold text-[#c43c32]">
               {readyCount} waiting to collect
             </span>
           ) : null}
         </div>
-        <p className="relative mt-4 inline-flex items-center gap-2 rounded-full border border-[var(--lock-border)] bg-[var(--lock-bg)] px-3 py-1.5 text-xs font-medium text-[var(--lock-text)]">
-          <span className="h-1.5 w-1.5 rounded-full bg-[#1aa392]" />
+        <p className="glass relative z-10 mt-4 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium text-[var(--header-copy)]">
+          <span className="dot-live h-1.5 w-1.5 rounded-full bg-[#1aa392]" />
           Timers are locked on the hostel server
         </p>
       </header>
 
       <nav className="sticky top-3 z-20 mt-5 overflow-x-auto no-scrollbar">
-        <div className="flex gap-2 rounded-full border border-[var(--nav-border)] bg-[var(--nav-bg)] p-1.5 backdrop-blur-md">
+        <div className="glass flex gap-2 rounded-full p-1.5">
           {grouped.map(({ floor, machines: floorMachines }) => (
             <button
               key={floor}
               type="button"
               onClick={() => goToFloor(floor)}
-              className={`flex min-w-0 flex-1 items-center justify-center gap-2 rounded-full px-3 py-2.5 text-sm font-semibold ${
+              className={`btn-press relative z-10 flex min-w-0 flex-1 items-center justify-center gap-2 rounded-full px-3 py-2.5 text-sm font-semibold ${
                 activeFloor === floor
-                  ? "bg-[var(--nav-active-bg)] text-[var(--nav-active-text)]"
+                  ? "bg-[var(--nav-active-bg)] text-[var(--nav-active-text)] shadow-[0_8px_20px_rgba(0,0,0,0.12)]"
                   : "text-[var(--nav-text)]"
               }`}
             >
@@ -211,7 +214,7 @@ export function LaundryBoard() {
       </nav>
 
       {notice ? (
-        <p className="mt-4 rounded-2xl bg-[#fde3e0] px-4 py-3 text-sm font-medium text-[#c43c32]">
+        <p className="glass mt-4 rounded-2xl bg-[var(--chip-ready-bg)] px-4 py-3 text-sm font-medium text-[#c43c32]">
           {notice}
         </p>
       ) : null}
@@ -220,8 +223,13 @@ export function LaundryBoard() {
         <p className="mt-16 text-center text-[var(--page-muted)]">Loading machines…</p>
       ) : (
         <div className="mt-8 space-y-10">
-          {grouped.map(({ floor, machines: floorMachines }) => (
-            <section key={floor} id={`floor-${floor}`} className="scroll-mt-24">
+          {grouped.map(({ floor, machines: floorMachines }, floorIndex) => (
+            <section
+              key={floor}
+              id={`floor-${floor}`}
+              className="fade-up scroll-mt-24"
+              style={{ animationDelay: `${floorIndex * 90}ms` }}
+            >
               <div className="mb-4 flex items-end justify-between">
                 <h2 className="display text-3xl text-[var(--page-text)]">Floor {floor}</h2>
                 <p className="text-sm text-[var(--page-faint)]">2 machines</p>
@@ -243,13 +251,13 @@ export function LaundryBoard() {
         </div>
       )}
 
-      <footer className="mt-16 flex items-center justify-center gap-2 text-sm text-[var(--page-faint)]">
+      <footer className="glass mx-auto mt-16 flex w-fit items-center justify-center gap-2 rounded-full px-4 py-2 text-sm text-[var(--page-faint)]">
         <img
           src="/your-space-logo.png"
           alt=""
-          className="h-6 w-auto opacity-90"
+          className="relative z-10 h-6 w-auto opacity-90"
         />
-        <span>Your Space 1 · laundry board</span>
+        <span className="relative z-10">Your Space 1 · laundry board</span>
       </footer>
     </main>
   );
