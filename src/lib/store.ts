@@ -1,3 +1,4 @@
+import { randomUUID, timingSafeEqual } from "node:crypto";
 import { mkdir, readFile, writeFile } from "fs/promises";
 import path from "path";
 import { CYCLE_MINUTES, FLOORS, MACHINE_NUMBERS } from "./constants";
@@ -112,7 +113,7 @@ function tokensMatch(expected: string, received: string) {
   if (left.length === 0 || left.length !== right.length) {
     return false;
   }
-  return crypto.timingSafeEqual(left, right);
+  return timingSafeEqual(left, right);
 }
 
 function sanitizeBoard(raw: unknown): Machine[] {
@@ -286,8 +287,8 @@ export async function occupyMachine(
     }
 
     const { name, room, phone, cycleMinutes } = validateOccupy(payload);
-    const claimToken = crypto.randomUUID();
-    const claimId = crypto.randomUUID();
+    const claimToken = randomUUID();
+    const claimId = randomUUID();
 
     machine.occupant = {
       name,
