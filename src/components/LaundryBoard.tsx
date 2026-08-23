@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { getProviders, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { FLOORS, PENDING_MACHINE_KEY } from "@/lib/constants";
 import type { BoardPayload, PublicMachine } from "@/lib/types";
 import { AuthButton } from "./AuthButton";
@@ -25,13 +25,6 @@ export function LaundryBoard() {
   const [loading, setLoading] = useState(true);
   const [activeFloor, setActiveFloor] = useState<(typeof FLOORS)[number]>(1);
   const [pendingMachineId, setPendingMachineId] = useState<string | null>(null);
-  const [googleAvailable, setGoogleAvailable] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    getProviders()
-      .then((providers) => setGoogleAvailable(Boolean(providers?.google)))
-      .catch(() => setGoogleAvailable(false));
-  }, []);
 
   const applyBoard = useCallback((data: BoardPayload) => {
     setMachines(data.machines);
@@ -171,8 +164,9 @@ export function LaundryBoard() {
           </div>
         </div>
         <p className="relative z-10 mt-4 max-w-xl text-sm leading-6 text-[var(--header-copy)] sm:text-base">
-          Three floors. Two machines each. Put your name on a washer, then the
-          next person can call you when the clothes are done.
+          Three floors. Two machines each. Sign in with Google to put your name
+          on a washer, then the next person can call you when the clothes are
+          done.
         </p>
         <div className="relative z-10 mt-5 flex flex-wrap gap-2 text-sm">
           <span className="glass rounded-full bg-[var(--chip-free-bg)] px-3 py-1.5 font-semibold text-[#2f7a58]">
@@ -258,13 +252,11 @@ export function LaundryBoard() {
                     remainingSeconds={liveRemaining(machine)}
                     busy={busyId === machine.id}
                     signedIn={Boolean(session?.user)}
-                    sessionLoading={status === "loading" || googleAvailable === null}
-                    googleAvailable={googleAvailable === true}
+                    sessionLoading={status === "loading"}
                     startOpen={
                       pendingMachineId === machine.id &&
-                      status !== "loading" &&
-                      googleAvailable !== null &&
-                      (Boolean(session?.user) || !googleAvailable)
+                      status === "authenticated" &&
+                      Boolean(session?.user)
                     }
                     onOccupy={async (payload) => {
                       sessionStorage.removeItem(PENDING_MACHINE_KEY);

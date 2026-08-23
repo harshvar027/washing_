@@ -15,7 +15,6 @@ type Props = {
   busy: boolean;
   signedIn: boolean;
   sessionLoading: boolean;
-  googleAvailable: boolean;
   onOccupy: (payload: {
     name: string;
     room: string;
@@ -32,20 +31,19 @@ export function MachineCard({
   busy,
   signedIn,
   sessionLoading,
-  googleAvailable,
   onOccupy,
   onFree,
 }: Props) {
-  const [open, setOpen] = useState(startOpen);
+  const [open, setOpen] = useState(false);
   const [confirmFree, setConfirmFree] = useState(false);
 
   useEffect(() => {
-    if (startOpen) setOpen(true);
-  }, [startOpen]);
+    if (startOpen && signedIn) setOpen(true);
+  }, [startOpen, signedIn]);
 
   function startClaim() {
     if (sessionLoading || busy) return;
-    if (googleAvailable && !signedIn) {
+    if (!signedIn) {
       sessionStorage.setItem(PENDING_MACHINE_KEY, machine.id);
       void signIn("google", { callbackUrl: "/" });
       return;
@@ -145,8 +143,8 @@ export function MachineCard({
           </div>
         ) : (
           <p className="relative z-10 mt-4 text-sm leading-6 text-[var(--card-muted)]">
-            Sign in with Google, then add your room before you start. Your
-            details stay on this machine until the clothes are collected.
+            Google sign-in is required to start a wash. Then add your room.
+            Your details stay on this machine until the clothes are collected.
           </p>
         )}
 
@@ -217,7 +215,7 @@ export function MachineCard({
         </div>
       </article>
 
-      {open ? (
+      {open && signedIn ? (
         <OccupyModal
           machineId={machine.id}
           floor={machine.floor}

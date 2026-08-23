@@ -37,7 +37,7 @@ After that, every phone sees the same board and timers stay locked on the server
 
 ## Google sign-in
 
-Google can fill **name** and **phone** when someone starts a wash. Room number is still typed. If Google has no phone number, they enter it by hand.
+Google sign-in is **required** to start a wash. It fills **name** and **phone** when Google shares them. Room number is still typed. If Google has no phone number, they enter it by hand.
 
 1. In [Google Cloud Console](https://console.cloud.google.com/) create an OAuth client (Web application).
 2. Enable the **People API**.
@@ -51,14 +51,13 @@ Google can fill **name** and **phone** when someone starts a wash. Room number i
    - `NEXTAUTH_URL` (`http://localhost:3000` locally, or the live site URL)
 5. Redeploy.
 
-Without these keys the board still works; people just type name and phone themselves.
+Without these keys, people cannot start a wash.
 
 ## How to use it
 
 1. Open the floor you are on.
-2. Tap **I am using this machine**.
-3. Sign in with Google if you want name and phone filled, or type them.
-4. Enter your room number and wash time (30 / 45 / 60 minutes).
-5. The countdown starts on the server at that moment and cannot be edited.
-6. When clothes are left behind, the next person taps **Call** or **WhatsApp**.
-7. After the clothes are taken out, tap **Clothes collected** so the machine shows as free.
+2. Tap **I am using this machine** and sign in with Google.
+3. Enter your room number and wash time (30 / 45 / 60 minutes).
+4. The countdown starts on the server at that moment and cannot be edited.
+5. When clothes are left behind, the next person taps **Call** or **WhatsApp**.
+6. After the clothes are taken out, tap **Clothes collected** so the machine shows as free.
