@@ -1,8 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { FLOORS } from "@/lib/constants";
+import { FLOORS, PENDING_MACHINE_KEY } from "@/lib/constants";
 import type { BoardPayload, PublicMachine } from "@/lib/types";
+import { AuthButton } from "./AuthButton";
 import { MachineCard } from "./MachineCard";
 import { ThemeToggle } from "./ThemeToggle";
 
@@ -21,6 +22,7 @@ export function LaundryBoard() {
   const [notice, setNotice] = useState("");
   const [loading, setLoading] = useState(true);
   const [activeFloor, setActiveFloor] = useState<(typeof FLOORS)[number]>(1);
+  const [pendingMachineId, setPendingMachineId] = useState<string | null>(null);
 
   const applyBoard = useCallback((data: BoardPayload) => {
     setMachines(data.machines);
@@ -38,6 +40,8 @@ export function LaundryBoard() {
   }, [applyBoard]);
 
   useEffect(() => {
+    const pending = sessionStorage.getItem(PENDING_MACHINE_KEY);
+    if (pending) setPendingMachineId(pending);
     load().catch((error: Error) => {
       setNotice(error.message);
       setLoading(false);
@@ -152,7 +156,10 @@ export function LaundryBoard() {
               </h1>
             </div>
           </div>
-          <ThemeToggle />
+          <div className="flex shrink-0 items-center gap-2">
+            <AuthButton />
+            <ThemeToggle />
+          </div>
         </div>
         <p className="relative z-10 mt-4 max-w-xl text-sm leading-6 text-[var(--header-copy)] sm:text-base">
           Three floors. Two machines each. Put your name on a washer, then the
@@ -241,7 +248,12 @@ export function LaundryBoard() {
                     machine={machine}
                     remainingSeconds={liveRemaining(machine)}
                     busy={busyId === machine.id}
-                    onOccupy={(payload) => occupy(machine.id, payload)}
+                    startOpen={pendingMachineId === machine.id}
+                    onOccupy={async (payload) => {
+                      sessionStorage.removeItem(PENDING_MACHINE_KEY);
+                      setPendingMachineId(null);
+                      await occupy(machine.id, payload);
+                    }}
                     onFree={() => free(machine.id)}
                   />
                 ))}

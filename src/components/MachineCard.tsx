@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { formatCountdown, formatPhone } from "@/lib/format";
 import type { MachineStatus, PublicMachine } from "@/lib/types";
 import { OccupyModal } from "./OccupyModal";
@@ -9,6 +9,7 @@ import { WasherVisual } from "./WasherVisual";
 type Props = {
   machine: PublicMachine;
   remainingSeconds: number | null;
+  startOpen?: boolean;
   busy: boolean;
   onOccupy: (payload: {
     name: string;
@@ -22,12 +23,17 @@ type Props = {
 export function MachineCard({
   machine,
   remainingSeconds,
+  startOpen = false,
   busy,
   onOccupy,
   onFree,
 }: Props) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(startOpen);
   const [confirmFree, setConfirmFree] = useState(false);
+
+  useEffect(() => {
+    if (startOpen) setOpen(true);
+  }, [startOpen]);
   const occupant = machine.occupant;
   const liveRemaining = remainingSeconds ?? 0;
   const status: MachineStatus = !occupant
@@ -195,6 +201,7 @@ export function MachineCard({
 
       {open ? (
         <OccupyModal
+          machineId={machine.id}
           floor={machine.floor}
           number={machine.number}
           busy={busy}

@@ -1,9 +1,12 @@
 "use client";
 
-import { FormEvent, useState } from "react";
-import { CYCLE_MINUTES } from "@/lib/constants";
+import { FormEvent, useEffect, useState } from "react";
+import { getProviders, signIn, useSession } from "next-auth/react";
+import { PENDING_MACHINE_KEY, CYCLE_MINUTES } from "@/lib/constants";
+import { GoogleMark } from "./AuthButton";
 
 type Props = {
+  machineId: string;
   floor: number;
   number: number;
   busy: boolean;
@@ -17,27 +20,56 @@ type Props = {
 };
 
 export function OccupyModal({
+  machineId,
   floor,
   number,
   busy,
   onClose,
   onSubmit,
 }: Props) {
+  const { data: session } = useSession();
   const [name, setName] = useState("");
   const [room, setRoom] = useState("");
   const [phone, setPhone] = useState("");
   const [cycleMinutes, setCycleMinutes] = useState(45);
   const [error, setError] = useState("");
+  const [googleAvailable, setGoogleAvailable] = useState(false);
+
+  useEffect(() => {
+    getProviders()
+      .then((providers) => setGoogleAvailable(Boolean(providers?.google)))
+      .catch(() => setGoogleAvailable(false));
+  }, []);
+
+  useEffect(() => {
+    const googleName = session?.user?.name?.trim() ?? "";
+    const googlePhone = session?.user?.phone?.trim() ?? "";
+    if (googleName) setName(googleName.slice(0, 40));
+    if (googlePhone) setPhone(googlePhone);
+  }, [session]);
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     setError("");
     try {
+      sessionStorage.removeItem(PENDING_MACHINE_KEY);
       await onSubmit({ name, room, phone, cycleMinutes });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not register.");
     }
   }
+
+  function close() {
+    sessionStorage.removeItem(PENDING_MACHINE_KEY);
+    onClose();
+  }
+
+  function startGoogle() {
+    sessionStorage.setItem(PENDING_MACHINE_KEY, machineId);
+    void signIn("google", { callbackUrl: "/" });
+  }
+
+  const googlePhoneMissing = Boolean(session?.user && !session.user.phone);
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-end bg-[var(--overlay)] p-4 backdrop-blur-xl sm:place-items-center">
@@ -50,9 +82,26 @@ export function OccupyModal({
         </p>
         <h2 className="display relative z-10 mt-1 text-3xl">Claim this washer</h2>
         <p className="relative z-10 mt-2 text-sm leading-6 text-[var(--card-muted)]">
-          The cycle clock starts on the hostel server the moment you register.
-          Phones cannot move it forward or back.
+          Sign in with Google to fill your name and phone. If Google has no
+          number, type it yourself. Room number is still entered by you.
         </p>
+
+        {googleAvailable && !session?.user ? (
+          <button
+            type="button"
+            onClick={startGoogle}
+            className="btn-press glass relative z-10 mt-4 flex w-full items-center justify-center gap-2 rounded-2xl px-3 py-3 text-sm font-semibold"
+          >
+            <GoogleMark />
+            Continue with Google
+          </button>
+        ) : null}
+
+        {session?.user ? (
+          <p className="relative z-10 mt-4 text-sm text-[var(--teal)]">
+            Signed in as {session.user.name || session.user.email}
+          </p>
+        ) : null}
 
         <label className="relative z-10 mt-5 block text-sm font-semibold">
           Name
@@ -93,6 +142,11 @@ export function OccupyModal({
             className="glass mt-1.5 w-full rounded-2xl px-4 py-3 font-normal outline-none focus:border-[var(--teal)]"
           />
         </label>
+        {googlePhoneMissing ? (
+          <p className="relative z-10 mt-1.5 text-xs leading-5 text-[var(--card-muted)]">
+            Google did not share a phone number. Enter your 10-digit mobile.
+          </p>
+        ) : null}
 
         <p className="relative z-10 mt-4 text-sm font-semibold">Wash cycle</p>
         <div className="relative z-10 mt-1.5 grid grid-cols-3 gap-2">
@@ -119,7 +173,7 @@ export function OccupyModal({
         <div className="relative z-10 mt-5 grid grid-cols-2 gap-2">
           <button
             type="button"
-            onClick={onClose}
+            onClick={close}
             className="btn-press glass rounded-2xl px-3 py-3 text-sm font-semibold"
           >
             Cancel
