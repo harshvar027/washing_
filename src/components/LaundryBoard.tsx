@@ -1,14 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  clearClaim,
-  loadClaims,
-  ownsMachine,
-  pruneClaims,
-  saveClaim,
-  type StoredClaim,
-} from "@/lib/claims";
 import { FLOORS } from "@/lib/constants";
 import type { BoardPayload, PublicMachine } from "@/lib/types";
 import { MachineCard } from "./MachineCard";
@@ -29,17 +21,9 @@ export function LaundryBoard() {
   const [notice, setNotice] = useState("");
   const [loading, setLoading] = useState(true);
   const [activeFloor, setActiveFloor] = useState<(typeof FLOORS)[number]>(1);
-  const [claims, setClaims] = useState<Record<string, StoredClaim>>({});
 
   const applyBoard = useCallback((data: BoardPayload) => {
     setMachines(data.machines);
-    setClaims(
-      pruneClaims(
-        data.machines
-          .filter((machine) => machine.occupant)
-          .map((machine) => machine.id),
-      ),
-    );
     setSyncedAt(performance.now());
     setNow(performance.now());
     setLoading(false);
@@ -54,7 +38,6 @@ export function LaundryBoard() {
   }, [applyBoard]);
 
   useEffect(() => {
-    setClaims(loadClaims());
     load().catch((error: Error) => {
       setNotice(error.message);
       setLoading(false);
@@ -112,11 +95,7 @@ export function LaundryBoard() {
       if (!response.ok) {
         await readError(response);
       }
-      const data = (await response.json()) as BoardPayload;
-      if (data.claimToken && data.claimId) {
-        saveClaim(id, { token: data.claimToken, claimId: data.claimId });
-      }
-      applyBoard(data);
+      applyBoard((await response.json()) as BoardPayload);
     } finally {
       setBusyId(null);
     }
@@ -126,20 +105,12 @@ export function LaundryBoard() {
     setBusyId(id);
     setNotice("");
     try {
-      const token = loadClaims()[id]?.token || "";
       const response = await fetch(`/api/machines/${id}/free`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token }),
       });
       if (!response.ok) {
-        if (response.status === 403) {
-          clearClaim(id);
-          setClaims(loadClaims());
-        }
         await readError(response);
       }
-      clearClaim(id);
       applyBoard((await response.json()) as BoardPayload);
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "Could not free machine.");
@@ -270,11 +241,6 @@ export function LaundryBoard() {
                     machine={machine}
                     remainingSeconds={liveRemaining(machine)}
                     busy={busyId === machine.id}
-                    isOwner={ownsMachine(
-                      machine.id,
-                      machine.occupant?.claimId,
-                      claims,
-                    )}
                     onOccupy={(payload) => occupy(machine.id, payload)}
                     onFree={() => free(machine.id)}
                   />

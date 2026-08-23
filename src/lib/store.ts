@@ -1,4 +1,3 @@
-import { randomUUID, timingSafeEqual } from "node:crypto";
 import { mkdir, readFile, writeFile } from "fs/promises";
 import path from "path";
 import { CYCLE_MINUTES, FLOORS, MACHINE_NUMBERS } from "./constants";
@@ -87,33 +86,13 @@ function sanitizeOccupant(raw: unknown): Occupant | null {
   if (!isCycle(cycleMinutes)) return null;
   if (!Number.isFinite(startedAt)) return null;
 
-  const claimToken = String(row.claimToken ?? "");
-  const claimId = String(row.claimId ?? "");
-
   return {
     name,
     room,
     phone,
     startedAt: new Date(startedAt).toISOString(),
     cycleMinutes,
-    claimToken: isClaimToken(claimToken) ? claimToken : "",
-    claimId: isClaimToken(claimId) ? claimId : "",
   };
-}
-
-function isClaimToken(value: string) {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
-    value,
-  );
-}
-
-function tokensMatch(expected: string, received: string) {
-  const left = Buffer.from(expected);
-  const right = Buffer.from(received);
-  if (left.length === 0 || left.length !== right.length) {
-    return false;
-  }
-  return timingSafeEqual(left, right);
 }
 
 function sanitizeBoard(raw: unknown): Machine[] {
@@ -273,7 +252,7 @@ function validateOccupy(payload: OccupyPayload) {
 export async function occupyMachine(
   id: string,
   payload: OccupyPayload,
-): Promise<{ machines: Machine[]; claimToken: string }> {
+): Promise<Machine[]> {
   return withLock(async () => {
     const machines = await readBoard();
     const machine = machines.find((item) => item.id === id);
@@ -287,8 +266,6 @@ export async function occupyMachine(
     }
 
     const { name, room, phone, cycleMinutes } = validateOccupy(payload);
-    const claimToken = randomUUID();
-    const claimId = randomUUID();
 
     machine.occupant = {
       name,
@@ -296,32 +273,19 @@ export async function occupyMachine(
       phone,
       startedAt: new Date().toISOString(),
       cycleMinutes,
-      claimToken,
-      claimId,
     };
 
     await writeBoard(machines);
-    return { machines, claimToken };
+    return machines;
   });
 }
 
-export async function freeMachine(
-  id: string,
-  token: string,
-): Promise<Machine[]> {
+export async function freeMachine(id: string): Promise<Machine[]> {
   return withLock(async () => {
     const machines = await readBoard();
     const machine = machines.find((item) => item.id === id);
     if (!machine) {
       throw new Error("That machine does not exist.");
-    }
-    if (!machine.occupant) {
-      return machines;
-    }
-    if (!tokensMatch(machine.occupant.claimToken, token)) {
-      throw new Error(
-        "Only the person who started this wash can mark clothes collected.",
-      );
     }
 
     machine.occupant = null;
