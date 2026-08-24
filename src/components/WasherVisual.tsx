@@ -28,11 +28,11 @@ export function WasherVisual({ status, remainingSeconds, cycleMinutes }: Props) 
         : "var(--washer-face)";
 
   return (
-    <div className="relative z-10 mx-auto grid h-[168px] w-[168px] place-items-center">
+    <div className="relative z-10 mx-auto grid h-[148px] w-[148px] place-items-center sm:h-[168px] sm:w-[168px]">
       <div className="absolute inset-0 rounded-[36px] bg-gradient-to-b from-[var(--washer-from)] to-[var(--washer-to)] shadow-[inset_0_1px_0_rgba(255,255,255,0.45),0_18px_30px_rgba(0,0,0,0.16)] backdrop-blur-md" />
       <div className="absolute inset-[10px] rounded-[28px] bg-[var(--washer-inner)] backdrop-blur-sm" />
       <div className="pointer-events-none absolute left-7 top-6 h-8 w-14 rounded-full bg-white/35 blur-[2px]" />
-      <svg viewBox="0 0 140 140" className="relative h-[140px] w-[140px]">
+      <svg viewBox="0 0 140 140" className="relative h-[124px] w-[124px] sm:h-[140px] sm:w-[140px]">
         <circle cx="70" cy="70" r="62" fill="var(--washer-rim)" />
         <circle cx="70" cy="70" r="58" fill={face} />
         <circle

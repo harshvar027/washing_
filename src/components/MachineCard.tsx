@@ -81,7 +81,7 @@ export function MachineCard({
   return (
     <>
       <article
-        className={`glass card-lift overflow-hidden rounded-[32px] p-5 text-[var(--card-text)] ${
+        className={`glass card-lift overflow-hidden rounded-[24px] p-4 text-[var(--card-text)] sm:rounded-[32px] sm:p-5 ${
           status === "ready" ? "ready-pulse" : ""
         } ${status === "washing" ? "shine" : ""}`}
       >
@@ -90,7 +90,7 @@ export function MachineCard({
             <p className="text-xs font-semibold tracking-[0.2em] text-[var(--card-faint)] uppercase">
               Machine {machine.number}
             </p>
-            <h3 className="display mt-1 text-[2rem] leading-none">{statusCopy}</h3>
+            <h3 className="display mt-1 text-[1.7rem] leading-none sm:text-[2rem]">{statusCopy}</h3>
           </div>
           <span
             className={`relative z-10 rounded-full px-3 py-1 text-xs font-semibold backdrop-blur-md ${
@@ -115,9 +115,9 @@ export function MachineCard({
 
         {occupant ? (
           <div className="glass glass-strong relative z-10 mt-4 rounded-[24px] p-4">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-lg font-semibold">{occupant.name}</p>
+            <div className="flex min-w-0 items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="truncate text-lg font-semibold">{occupant.name}</p>
                 {occupant.room ? (
                   <p className="mt-0.5 text-sm font-semibold text-[var(--card-text)]">
                     Room {occupant.room}
@@ -127,7 +127,7 @@ export function MachineCard({
                   {formatPhone(occupant.phone)}
                 </p>
               </div>
-              <p className="text-right text-xs font-medium text-[var(--card-faint)]">
+              <p className="shrink-0 text-right text-xs font-medium text-[var(--card-faint)]">
                 Started
                 <br />
                 <span className="text-sm text-[var(--card-text)]">{machine.startedLabel}</span>

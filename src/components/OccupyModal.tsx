@@ -102,18 +102,18 @@ export function OccupyModal({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[100] grid place-items-end overflow-y-auto overscroll-none bg-[var(--overlay)] p-4 backdrop-blur-xl sm:place-items-center"
+      className="fixed inset-0 z-[100] grid place-items-end overflow-y-auto overscroll-none bg-[var(--overlay)] p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-xl sm:place-items-center sm:p-4"
       onClick={close}
     >
       <form
         onSubmit={handleSubmit}
         onClick={(event) => event.stopPropagation()}
-        className="glass glass-strong fade-up w-full max-w-md overflow-hidden rounded-[32px] p-5 text-[var(--card-text)]"
+        className="glass glass-strong fade-up my-auto max-h-[min(92dvh,100%)] w-full max-w-md overflow-y-auto rounded-[24px] p-4 text-[var(--card-text)] sm:rounded-[32px] sm:p-5"
       >
         <p className="relative z-10 text-xs font-semibold tracking-[0.2em] text-[var(--teal)] uppercase">
           Floor {floor} · Machine {number}
         </p>
-        <h2 className="display relative z-10 mt-1 text-3xl">Claim this washer</h2>
+        <h2 className="display relative z-10 mt-1 text-[1.85rem] sm:text-3xl">Claim this washer</h2>
         <p className="relative z-10 mt-2 text-sm leading-6 text-[var(--card-muted)]">
           {signedIn
             ? "You must be signed in to start a wash. Add your room, pick a cycle, then start the timer."

@@ -134,31 +134,31 @@ export function LaundryBoard() {
   }
 
   return (
-    <main className="relative z-10 mx-auto min-h-dvh max-w-5xl px-4 pb-20 pt-6 sm:px-6">
+    <main className="relative z-10 mx-auto min-h-dvh max-w-5xl px-3 pb-[max(5rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))] sm:px-6 sm:pt-6">
       <div className="orb orb-a" />
       <div className="orb orb-b" />
       <div className="orb orb-c" />
 
-      <header className="glass shine fade-up overflow-hidden rounded-[36px] px-5 py-6 sm:px-8 sm:py-8">
-        <div className="relative z-10 flex items-start justify-between gap-3">
-          <div className="flex min-w-0 items-center gap-3 sm:gap-4">
-            <div className="glass glass-strong shrink-0 rounded-2xl px-2.5 py-2">
+      <header className="glass shine fade-up overflow-hidden rounded-[28px] px-4 py-5 sm:rounded-[36px] sm:px-8 sm:py-8">
+        <div className="relative z-10 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="glass glass-strong shrink-0 rounded-2xl px-2 py-1.5 sm:px-2.5 sm:py-2">
               <img
                 src="/your-space-logo.png"
                 alt="your space"
-                className="relative z-10 h-9 w-auto sm:h-11"
+                className="relative z-10 h-8 w-auto sm:h-11"
               />
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-semibold tracking-[0.24em] text-[var(--header-kicker)] uppercase">
+              <p className="text-[10px] font-semibold tracking-[0.2em] text-[var(--header-kicker)] uppercase sm:text-xs sm:tracking-[0.24em]">
                 Hostel laundry
               </p>
-              <h1 className="display mt-1 text-3xl leading-none text-[var(--header-title)] sm:text-5xl">
+              <h1 className="display mt-1 text-[1.85rem] leading-none text-[var(--header-title)] sm:text-5xl">
                 Your Space 1
               </h1>
             </div>
           </div>
-          <div className="flex shrink-0 items-center gap-2">
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
             <AuthButton />
             <ThemeToggle />
           </div>
@@ -187,14 +187,14 @@ export function LaundryBoard() {
         </p>
       </header>
 
-      <nav className="sticky top-3 z-20 mt-5 overflow-x-auto no-scrollbar">
-        <div className="glass flex gap-2 rounded-full p-1.5">
+      <nav className="sticky top-[max(0.75rem,env(safe-area-inset-top))] z-20 mt-4 overflow-x-auto no-scrollbar sm:mt-5">
+        <div className="glass flex w-full gap-1 rounded-full p-1 sm:gap-2 sm:p-1.5">
           {grouped.map(({ floor, machines: floorMachines }) => (
             <button
               key={floor}
               type="button"
               onClick={() => goToFloor(floor)}
-              className={`btn-press relative z-10 flex min-w-0 flex-1 items-center justify-center gap-2 rounded-full px-3 py-2.5 text-sm font-semibold ${
+              className={`btn-press relative z-10 flex min-w-0 flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-full px-2 py-2 text-xs font-semibold sm:gap-2 sm:px-3 sm:py-2.5 sm:text-sm ${
                 activeFloor === floor
                   ? "bg-[var(--nav-active-bg)] text-[var(--nav-active-text)] shadow-[0_8px_20px_rgba(0,0,0,0.12)]"
                   : "text-[var(--nav-text)]"
@@ -241,7 +241,7 @@ export function LaundryBoard() {
               style={{ animationDelay: `${floorIndex * 90}ms` }}
             >
               <div className="mb-4 flex items-end justify-between">
-                <h2 className="display text-3xl text-[var(--page-text)]">Floor {floor}</h2>
+                <h2 className="display text-2xl text-[var(--page-text)] sm:text-3xl">Floor {floor}</h2>
                 <p className="text-sm text-[var(--page-faint)]">2 machines</p>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -276,7 +276,7 @@ export function LaundryBoard() {
         </div>
       )}
 
-      <footer className="glass mx-auto mt-16 flex w-fit items-center justify-center gap-2 rounded-full px-4 py-2 text-sm text-[var(--page-faint)]">
+      <footer className="glass mx-auto mt-12 flex w-fit max-w-[calc(100%-1.5rem)] items-center justify-center gap-2 rounded-full px-3 py-2 text-xs text-[var(--page-faint)] sm:mt-16 sm:px-4 sm:text-sm">
         <img
           src="/your-space-logo.png"
           alt=""

@@ -15,8 +15,8 @@ export function AuthButton() {
 
   if (session?.user) {
     return (
-      <div className="flex max-w-[16rem] items-center gap-1.5">
-        <div className="glass relative z-10 inline-flex h-11 min-w-0 items-center gap-2 rounded-full px-3 text-sm font-semibold text-[var(--card-text)]">
+      <div className="flex min-w-0 max-w-full items-center gap-1.5 sm:max-w-[16rem]">
+        <div className="glass relative z-10 inline-flex h-10 min-w-0 items-center gap-2 rounded-full px-2.5 text-sm font-semibold text-[var(--card-text)] sm:h-11 sm:px-3">
           {session.user.image ? (
             <img
               src={session.user.image}
@@ -24,14 +24,14 @@ export function AuthButton() {
               className="h-6 w-6 shrink-0 rounded-full"
             />
           ) : null}
-          <span className="truncate">
+          <span className="hidden truncate min-[420px]:inline">
             {session.user.name?.split(" ")[0] || "Signed in"}
           </span>
         </div>
         <button
           type="button"
           onClick={() => signOut({ callbackUrl: "/" })}
-          className="btn-press glass relative z-10 inline-flex h-11 shrink-0 items-center rounded-full px-3.5 text-sm font-semibold text-[var(--card-text)]"
+          className="btn-press glass relative z-10 inline-flex h-10 shrink-0 items-center rounded-full px-3 text-xs font-semibold text-[var(--card-text)] sm:h-11 sm:px-3.5 sm:text-sm"
         >
           Log out
         </button>
@@ -47,7 +47,7 @@ export function AuthButton() {
     <button
       type="button"
       onClick={() => signIn("google")}
-      className="btn-press glass relative z-10 inline-flex h-11 items-center gap-2 rounded-full px-3.5 text-sm font-semibold text-[var(--card-text)]"
+      className="btn-press glass relative z-10 inline-flex h-10 items-center gap-2 rounded-full px-3 text-sm font-semibold text-[var(--card-text)] sm:h-11 sm:px-3.5"
     >
       <GoogleMark />
       Google
