@@ -15,20 +15,27 @@ export function AuthButton() {
 
   if (session?.user) {
     return (
-      <button
-        type="button"
-        onClick={() => signOut()}
-        className="btn-press glass relative z-10 inline-flex h-11 max-w-[11rem] items-center gap-2 rounded-full px-3.5 text-sm font-semibold text-[var(--card-text)]"
-      >
-        {session.user.image ? (
-          <img
-            src={session.user.image}
-            alt=""
-            className="h-6 w-6 rounded-full"
-          />
-        ) : null}
-        <span className="truncate">{session.user.name?.split(" ")[0] || "Signed in"}</span>
-      </button>
+      <div className="flex max-w-[16rem] items-center gap-1.5">
+        <div className="glass relative z-10 inline-flex h-11 min-w-0 items-center gap-2 rounded-full px-3 text-sm font-semibold text-[var(--card-text)]">
+          {session.user.image ? (
+            <img
+              src={session.user.image}
+              alt=""
+              className="h-6 w-6 shrink-0 rounded-full"
+            />
+          ) : null}
+          <span className="truncate">
+            {session.user.name?.split(" ")[0] || "Signed in"}
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={() => signOut({ callbackUrl: "/" })}
+          className="btn-press glass relative z-10 inline-flex h-11 shrink-0 items-center rounded-full px-3.5 text-sm font-semibold text-[var(--card-text)]"
+        >
+          Log out
+        </button>
+      </div>
     );
   }
 
